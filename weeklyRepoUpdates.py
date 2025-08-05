@@ -81,7 +81,7 @@ message.add_alternative(f"""
 """, subtype="html")
 # send email:
 with smtplib.SMTP_SSL("smtp.gmail.com") as smtp:
-    smtp.login("luism@psc.edu", "HelloB@@mer2169")
+    smtp.login("luism@psc.edu", "password")
     smtp.send_message(message)
 
 # to send it weekly we need to set up a cron job on terminal.
