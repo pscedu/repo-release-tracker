@@ -1,14 +1,18 @@
 # Ok First lets add in our code first and clean it up. Then lets add the stuff for sending emails
 
 #import libraries: PyGithub for accessing github API and pandas for dataframes
+from pydoc import html
 import sys
-!{sys.executable} -m pip install PyGithub
+#!{sys.executable} -m pip install PyGithub
 
 from github import Github
 import pandas as pd
 #import libraries for sending emails
 import smtplib
 from email.message import EmailMessage
+from datetime import datetime
+
+
 
 #create github instance and gets repo:
 g = Github("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")    # says can do 60 requests per hour but there are more than 60.
@@ -21,6 +25,7 @@ utilities_repos = ['hashdeep','dua','vim','timewarrior','libtiff-tools','wordgri
 
 #now lets go through them and extract the names, version, and years
 #starting with stem and then utilities repo:
+print("starting")
 stemRepo = []
 utilityRepo = []
 for repoName in stem_repos:
@@ -31,6 +36,7 @@ for repoName in stem_repos:
         date = str(latestRelease.published_at)[0:10]
     
         stemRepo.append([repoName, release, date])
+        print("finished " + repoName +"\n")
     except Exception as e:
         stemRepo.append([repoName, "No release", "N/A"])
 #now for utility repos:
@@ -49,6 +55,7 @@ for repoName in utilities_repos:
 #now lets make the dataframes for the repos:
 df_stem = pd.DataFrame(stemRepo, columns = ["STEM Repo Name", "Latest Version", "Date"])
 df_utility = pd.DataFrame(utilityRepo, columns = ["Utility Repo Name", "Latest Version", "Date"])
+print("finished making dataframes")
 
 # ok now let's convert the date column into datetime objects so we can sort by date
 
@@ -58,15 +65,39 @@ df_utility["Date"] = pd.to_datetime(df_utility["Date"], errors="coerce")
 df_Sorted_stem = df_stem.sort_values(by = "Date", ascending = False)
 df_Sorted_utility = df_utility.sort_values(by = "Date", ascending = False)
 
+
+
+#now lets link the release version to their github links as well:
+df_Sorted_stem["Latest Version"] = df_Sorted_stem.apply(
+    lambda row: f'<a href="https://github.com/pscedu/singularity-{row["STEM Repo Name"]}/releases">{row["Latest Version"]}</a>',
+    axis=1
+)
+
+df_Sorted_utility["Latest Version"] = df_Sorted_utility.apply(
+    lambda row: f'<a href="https://github.com/pscedu/singularity-{row["Utility Repo Name"]}/releases">{row["Latest Version"]}</a>',
+    axis=1
+)
+
+# now we need to link the repo names to their github links
+df_Sorted_stem["STEM Repo Name"] = df_Sorted_stem["STEM Repo Name"].apply(
+    lambda x: f'<a href="https://github.com/pscedu/singularity-{x}">{x}</a>'
+)
+
+df_Sorted_utility["Utility Repo Name"] = df_Sorted_utility["Utility Repo Name"].apply(
+    lambda x: f'<a href="https://github.com/pscedu/singularity-{x}">{x}</a>'
+)
+
+
 # convert the dataframes to html tables:
-html_stem = df_Sorted_stem.to_html(index=False, justify='left')
-html_utility = df_Sorted_utility.to_html(index=False, justify='left')
+html_stem = df_Sorted_stem.to_html(index=False, justify='left', escape =False)
+html_utility = df_Sorted_utility.to_html(index=False, justify='left', escape =False)
+
 
 # make email:
 message = EmailMessage()
-message["Subject"] = "Singularity Repos Latest Releases"
+message["Subject"] = f"Singularity Repos Latest Releases - {datetime.now().strftime('%Y-%m-%d')}"
 message["From"] = "luism@psc.edu"
-message["To"] = "icaoberg@psc.edu"
+message["To"] = "luisjorgerubio@gmail.com", "icaoberg@psc.edu"
 
 message.add_alternative(f"""
 <html>
@@ -79,9 +110,10 @@ message.add_alternative(f"""
 </body>
 </html>
 """, subtype="html")
-# send email:
-with smtplib.SMTP_SSL("smtp.gmail.com") as smtp:
-    smtp.login("luism@psc.edu", "password")
+# send email:a
+with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
+    smtp.login("luism@psc.edu", "ebxh ivrd pxtc zvwc")
     smtp.send_message(message)
 
+print("Email sent successfully!")
 # to send it weekly we need to set up a cron job on terminal.
