@@ -14,6 +14,8 @@ import pandas as pd
 from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment, Border, Side
 
+from datetime import datetime
+
 
 
 #create github instance and gets repo:
@@ -92,7 +94,7 @@ print(sorted_combined_df)
 
 wb = Workbook()
 ws = wb.active
-ws.title = "PSC Singularity Repository Versions"
+ws.title = "PSC Repo Versions"
 
 # create header row
 header = ["Category", "Repo Name", "Latest Version", "Date"]
@@ -130,3 +132,5 @@ file_name = f"github_releases_{today}.xlsx"
 
 # save the workbook
 wb.save("Repo_Versions.xlsx")
+
+print(f"Spreadsheet saved as {file_name}")
