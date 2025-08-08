@@ -20,7 +20,7 @@ from datetime import datetime
 #then we need to just show the part of csv file that has the specific repos
 
 #create github instance and gets repo:
-g = Github("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")    # says can do 60 requests per hour but there are more than 60.
+g = Github()    # says can do 60 requests per hour but there are more than 60.
 
 
 #get the names of the repos we want to check:
