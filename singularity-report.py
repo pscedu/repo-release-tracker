@@ -144,3 +144,4 @@ for _, row in filtered_df.iterrows():
 
 console = Console()
 console.print(table)
+
