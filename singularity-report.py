@@ -18,6 +18,8 @@ from openpyxl.styles import Font, Alignment, Border, Side
 
 from datetime import datetime
 
+from tqdm import tqdm
+
 # ok so need to just convert to just make csv file and then make prompt using argument parser for input arguments
 # then we need to just show the part of csv file that has the specific repos
 
@@ -137,10 +139,10 @@ utilities_repos = [
 
 # now lets go through them and extract the names, version, and years
 # starting with stem and then utilities repo:
-print("starting")
+print("Getting information from Github")
 stemRepo = []
 utilityRepo = []
-for repoName in stem_repos:
+for repoName in tqdm(stem_repos):
     try:
         repo = g.get_repo("pscedu/singularity-" + repoName)
         latestRelease = repo.get_latest_release()
